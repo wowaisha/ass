@@ -6,8 +6,13 @@ operator = [' és ', ' vagy ']  #az elso es masodik szo kozti op
 dyslexia_prob = 0.5  #a diszle
 
 
-def uniformDraw(array):
-  return array[math.floor(random.random() * len(array))]
+def uniformDraw(array, chance = True):
+    prob_number = random.random()
+    if chance == True:
+        return array[math.floor(random.random() * len(array))]
+    else:
+        value = ' vagy ' if 0.95 > prob_number else ' és '
+        return value
 
 def ComplexModel1():
   word1 = uniformDraw(feature1)
