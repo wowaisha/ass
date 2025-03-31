@@ -75,3 +75,11 @@ time.sleep(5)
 print('ComplexModel2 Tölt...')
 ComplexModel2()
 
+
+import itertools
+def probability_dice_sum_at_least_4():
+    total_outcomes = 6 * 6  # 2 kocka összes lehetséges kimenete 6x6
+    favorable_outcomes = sum(1 for d1, d2 in itertools.product(range(1, 7), repeat=2) if d1 + d2 >= 4) #kedvező kimenetel   
+    return favorable_outcomes / total_outcomes  # kedvező / összes kimenet
+print("Annak a valószínűsége, hogy az összeg legalább 4: {:.2%}".format(probability_dice_sum_at_least_4()))  #eredmény
+
