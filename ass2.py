@@ -12,3 +12,22 @@ intros A B C H HBC. # feltesszük, hogy H és HBC igaz
   - apply HBA; assumption. # ha HB igaz, akkor B -> A alapján A is igaz
   - apply HCA; assumption. # ha HC igaz, akkor C -> A alapján A is igaz
 Qed.
+
+
+intros A B H1 H2.
+destruct H1 as [HA | HNA].
+  - exact HA. # ha A igaz, akkor A is igaz
+  - specialize (H2 (fun _ => B)). # ha ~A igaz, negáció és implikáció
+    apply H2.
+    intro H. # feltételezve A igaz, ez ellentmondás
+    apply HNA. exact H.
+Qed.
+
+
+intros U A B H.
+destruct H as [x HAB].  # szétszedjük az 'exists x, A x /\ B x' kifejezést.
+destruct HAB as [HA HB].  # szétszedjük az 'A x' és 'B x' -t
+  split.
+  - exists x. exact HA. # van egy 'x', amelyre 'A x' igaz.
+  - exists x. exact HB.  # létezik egy 'x', amelyre 'B x' igaz.
+Qed.
