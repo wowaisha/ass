@@ -34,3 +34,33 @@ def calculate_distribution_given_W(target_sum):
 target_sum = 7 #7 a célérték 
 result = calculate_distribution_given_W(target_sum)
 print(f"X eloszlása, ha W = {target_sum}: {result}") 
+
+
+import random
+def monty_hall_simulation(num_trials, switch=True):
+    win_count = 0
+    
+    for _ in range(num_trials):
+        doors = ['goat', 'goat', 'car'] #autó és a kecskéke elhelyezése
+        random.shuffle(doors)
+        
+        player_choice = random.randint(0, 2) #ajtó választáss
+        
+        monty_choice = next(i for i in range(3) if i != player_choice and doors[i] == 'goat')  
+        # ajtó mögött amit kinyitnak, kecske
+        #olyan ajtó amit nem a játékos választ, kecske van mögötte
+        
+        if switch: # másik ajtó választása, vált
+            player_choice = next(i for i in range(3) if i != player_choice and i != monty_choice)
+        
+        if doors[player_choice] == 'car': #ellenőrzés
+            win_count += 1
+    
+    return win_count / num_trials 
+
+num_trials = 10000
+stay_win_rate = monty_hall_simulation(num_trials, switch=False)
+switch_win_rate = monty_hall_simulation(num_trials, switch=True)
+
+print(f"Hogyha a játékos mindig marad: {stay_win_rate:.2%} nyerési arány")
+print(f"Ha a játékos mindig változtat: {switch_win_rate:.2%} nyerési arány")
