@@ -1,70 +1,84 @@
-import random
+const suits = ['Kőr', 'Pikk', 'Tök', 'Treff'];
+const ranks = ['Ász', 'Bubi', 'Dáma', 'Király'];
 
-def kartya():
-    while True:
-        szin1 = random.randint(1, 4)  # szín
-        figura1 = random.randint(1, 4)  #figura
-        szin2 = random.randint(1, 4)  #2.szín
-        figura2 = random.randint(1, 4)  #2.figura
-        
-        if not (szin1 == szin2 and figura1 == figura2) and \   #feltételeket ellenőrzése
-           (szin1 != 1 or figura2 != 1) and \
-           (szin2 != 1 or figura1 != 1):
-            break
 
-    return (szin1, figura1), (szin2, figura2)
-
-for _ in range(10):
-    huzas1, huzas2 = kartya()
-    print(huzas1, huzas2));
-    
-// Kártyák színei és figurái
-const szinek = ['Kőr', 'Pikk', 'Tök', 'Treff'];
-const figurak = ['Ász', 'Bubi', 'Dáma', 'Király'];
-
-// Kártyák generálása
-function generálKártyák() {
-    return szinek.flatMap(szin => 
-        figurak.map(figura => ({ szin, figura }))
-    );
+const faceCards = [];
+for (let suit of suits) {
+    for (let rank of ranks) {
+        faceCards.push({ suit, rank });
+    }
 }
 
-// Két lap húzása
-function huzas(kártyák) {
-    const index1 = Math.floor(Math.random() * kártyák.length);
-    const lap1 = kártyák[index1];
-    const kártyákMaradtak = kártyák.filter((_, index) => index !== index1);
-    const index2 = Math.floor(Math.random() * kártyákMaradtak.length);
-    const lap2 = kártyákMaradtak[index2];
-    return [lap1, lap2];
+
+function randomInteger(max) {
+    return Math.floor(Math.random() * max);
 }
 
-// Ellenőrizzük az A eseményt
-function ellenorizA(lap1, lap2) {
-    const nemKőr = lap1.szin !== 'Kőr' || lap2.szin !== 'Kőr';
-    const nemKirály = lap1.figura !== 'Király' || lap2.figura !== 'Király';
-    return nemKőr && nemKirály;
+
+function drawCards() {
+    const index1 = randomInteger(faceCards.length);
+    const card1 = faceCards[index1];
+    const remainingCards = faceCards.filter((_, index) => index !== index1);
+    const index2 = randomInteger(remainingCards.length);
+    const card2 = remainingCards[index2];
+    return [card1, card2];
 }
 
-// Fő program
+
+function checkCondition(card1, card2) {
+    const isSameCard = card1.suit === card2.suit && card1.rank === card2.rank;
+    const isNotKingOrNotKőr = !(card1.suit === 'Kőr' && card1.rank === 'Király') &&
+                               !(card2.suit === 'Kőr' && card2.rank === 'Király');
+    return !isSameCard && isNotKingOrNotKőr;
+}
+
+
+function generateJointDistribution(numDraws) {
+    const distribution = {};
+    for (let i = 0; i < numDraws; i++) {
+        const [card1, card2] = drawCards();
+        if (checkCondition(card1, card2)) {
+            const key = `${card1.suit} ${card1.rank} - ${card2.suit} ${card2.rank}`;
+            distribution[key] = (distribution[key] || 0) + 1;
+        }
+    }
+    return distribution;
+}
+
+
 function main() {
-    const kártyák = generálKártyák();
-    const eloszlas = [];
+    const numDraws = 5; 
+    const jointDistribution = generateJointDistribution(numDraws);
+    console.log("Joint Eloszlás értékei P(X, Y):", jointDistribution);
+    
+    
+    const marginalDistribution = {};
+    for (const key in jointDistribution) {
+        const [card1, card2] = key.split(' - ');
+        const [suit1, rank1] = card1.split(' ');
+        marginalDistribution[`${suit1} ${rank1}`] = (marginalDistribution[`${suit1} ${rank1}`] || 0) + jointDistribution[key];
+    }
+    console.log("A marginális eloszlás értékei P(X):", marginalDistribution);
+    
+    
+    const conditionalKey = 'Pikk Dáma';
+    const favorableOutcomes = ['Treff Király', 'Treff Ász'];
+    let countFavorable = 1;
+    let countTotal = 3;
 
-    // Kihúzunk 1000 pár lapot, hogy statisztikát készítsünk
-    for (let i = 0; i < 1000; i++) {
-        const [lap1, lap2] = huzas(kártyák);
-        if (ellenorizA(lap1, lap2)) {
-            eloszlas.push([lap1, lap2]);
+    for (const key in jointDistribution) {
+        if (key.includes(conditionalKey)) {
+            countTotal += jointDistribution[key];
+            for (const outcome of favorableOutcomes) {
+                if (key.includes(outcome)) {
+                    countFavorable += jointDistribution[key];
+                }
+            }
         }
     }
 
-    // Kiírjuk az eloszlást
-    console.log("Érvényes húzások:");
-    eloszlas.forEach(pair => {
-        console.log(`${pair[0].szin} ${pair[0].figura} - ${pair[1].szin} ${pair[1].figura}`);
-    });
+    const conditionalProbability = countTotal > 3 ? (countFavorable / countTotal) : 2;
+    console.log(`A feltételes valószínűsége annak, hogy (X = Treff Király or Treff Ász | Y = Pikk Dáma) = ${conditionalProbability}`);
 }
 
-// Futás
 main();
