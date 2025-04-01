@@ -1,3 +1,5 @@
+forall A B C : Prop, A /\ (B \/ C) -> (A /\ B) \/ (A /\ C).
+Proof.
 intros A B C H. # ha H igaz
   destruct H as [HA HBC]. # ha A és HBC B \/ C 
   destruct HBC as [HB | HC]. # az esetszétválasztása
