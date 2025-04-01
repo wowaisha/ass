@@ -86,20 +86,17 @@ main();
 
 
 #4.2 feladat
-var data = [28, 31, 44, 29]; // Observed weights
+var data = [28, 31, 44, 29];
 
 var simpleModel = function() {
-    // Prior distribution based on the average weight and standard deviation
-    var mu_prior = 32; // Mean from the lexicon
-    var sigma_prior = 10; // Standard deviation from the lexicon
+    var mu_prior = 32; 
+    var sigma_prior = 10;
     var Prior = Gaussian({ mu: mu_prior, sigma: sigma_prior });
 
-    // Likelihood for each observed weight
     for (var i = 0; i < data.length; i++) {
         observe(Gaussian({ mu: Prior.mu, sigma: 1 }), data[i]);
     }
 
-    // Posterior distribution
     var Posterior = Gaussian({ mu: Prior.mu, sigma: sigma_prior });
 
     return {
@@ -112,5 +109,4 @@ var opts = { method: 'SMC', particles: 2000, rejuvSteps: 5 };
 
 var output_1 = Infer(opts, simpleModel);
 
-// Visualize the marginals of the posterior distribution
 viz.marginals(output_1);
